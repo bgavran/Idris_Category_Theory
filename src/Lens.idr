@@ -3,6 +3,8 @@ module Lens
 import Category
 import Monoidal
 
+%hide Prelude.(||)
+
 -- Commutative
 record Comonoid where
   constructor MkComonoid
@@ -28,18 +30,35 @@ record Lens
     get : hom (cat (mc lensCom)) (fst i') (fst o')
     put : hom (cat (mc lensCom)) (mapObj (x (mc lensCom)) ((fst i'), (snd o'))) (snd i')
 
+composePut : (cmnd : Comonoid)
+  -> (a, b, c : (obj (cat (mc cmnd)), obj (cat (mc cmnd))))
+  -> hom (cat (mc cmnd)) (mapObj (x (mc cmnd)) (fst b, snd c)) (snd b)
+  -> hom (cat (mc cmnd)) (fst b) (fst c)
+  -> hom (cat (mc cmnd)) (mapObj (x (mc cmnd)) (fst a, snd b)) (snd a)
+  -> hom (cat (mc cmnd)) (fst a) (fst b)
+  -> hom (cat (mc cmnd)) (mapObj (x (mc cmnd)) (fst a, snd c)) (snd a)
+composePut cmnd (a, a') (b, b') (c, c') p2 g2 p1 g1
+  = o (cat (mc cmnd))
+    ?zz
+    (mapMor (x (mc cmnd)) {a=(a, c')} {b=(a || b, c')}
+      (MkProdMor (o (cat (mc cmnd))
+        (mapMor (x (mc cmnd)) (MkProdMor (idd (cat (mc cmnd)) {a=a}) g1))
+        (copy cmnd)) (idd (cat (mc cmnd))))
+      )
+
+
 lensCompose : {cmnd : Comonoid} -> {a, b, c : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))}
   -> Lens cmnd b c -> Lens cmnd a b -> Lens cmnd a c
 lensCompose (MkLens g2 p2) (MkLens g1 p1) = MkLens
   (o (cat (mc cmnd)) g2 g1)
-  ?composePut
+  (composePut cmnd a b c p2 g2 p1 g1)
 
-  -- (mapMor (x (mc cmnd)) (mapObj (x (mc cmnd)) (fst a, fst a)) ((mapObj (x (mc cmnd)) (fst a, fst a)), fst a) (mapMor )  )
+
 -- Given a x b,  this projects the second element by using comonoid delete
 deleteSecond : (cmnd : Comonoid) -> (a : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))) -> hom (cat (mc cmnd)) (mapObj (x (mc cmnd)) (fst a, snd a)) (snd a)
 deleteSecond cmnd a = let mm = component $ natTrans $ leftUnitor $ mc cmnd
                           pr = MkProdMor (delete cmnd) (idd (cat (mc cmnd)))
-                      in o (cat (mc cmnd)) (mm $ snd a) (mapMor (x (mc cmnd)) (fst a, snd a) (unit (mc cmnd), snd a) pr)
+                      in o (cat (mc cmnd)) (mm $ snd a) (mapMor (x (mc cmnd)) {a=(fst a, snd a)} {b=(unit (mc cmnd), snd a)} pr)
 
 idLens : {cmnd : Comonoid} -> {a : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))}
   -> Lens cmnd a a
