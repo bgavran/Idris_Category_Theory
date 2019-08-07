@@ -3,46 +3,53 @@ module Lens
 import Category
 import Monoidal
 
---record Comonoid where
---  constructor MkComonoid
---  mc : MonoidalCat
---  --c : obj (cat mc)
---  eta : {a : obj (cat mc)} -> hom (cat mc) a (unit mc) -- counit
---  delta : (a : obj (cat mc)) -> hom (cat mc) a (mapObj (x mc) (a, a))
-  --copyDelete : {a : obj (cat mc)} ->
-  --  o (cat mc) (mapMor (x mc) (a, a) ((unit mc), a) ?aaa)
-  --  = idd (cat mc) {a=a}
+-- Commutative
+record Comonoid where
+  constructor MkComonoid
+  mc : MonoidalCat
+  delete : {a : obj (cat mc)} -> hom (cat mc) a (unit mc)
+  copy : {a : obj (cat mc)} -> hom (cat mc) a (mapObj (x mc) (a, a))
+--  copyDeleteLaw : {a : obj (cat mc)}
+--    -> o (cat mc) (mapMor (x mc) (a, a) ((unit mc), a) (MkProdMor (delete) (idd (cat mc)))) (copy) = idd (cat mc)
 
--- record ComonoidHom (c1 : Comonoid) (c2 : Comonoid) where
---   constructor MkComonoidMor
---   --comFunctor : FFunctor (mc c1) (mc c2)
 
+-- s -> (a, b -> t)
+
+||| Bimorphic lenses (called just lenses)
+|||  (s)          (a)     get: s -> a
+|||  ( )    ->    ( )
+|||  (t)          (b)     put: s x b -> t
 record Lens
-  (lensCat : MonoidalCat)
-  (i' : (obj (cat lensCat), obj (cat lensCat)))
-  (o' : (obj (cat lensCat), obj (cat lensCat)))
+  (lensCom : Comonoid)
+  (i' : (obj (cat (mc lensCom)), obj (cat (mc lensCom))))
+  (o' : (obj (cat (mc lensCom)), obj (cat (mc lensCom))))
     where
     constructor MkLens
-    get : hom (cat lensCat) (fst i') (fst o')
-    put : hom (cat lensCat) (mapObj (x lensCat) ((fst i'), (snd o'))) (fst o')
+    get : hom (cat (mc lensCom)) (fst i') (fst o')
+    put : hom (cat (mc lensCom)) (mapObj (x (mc lensCom)) ((fst i'), (snd o'))) (fst o')
 
 
-lensCompose : {mc : MonoidalCat} -> {a, b, c : (obj (cat mc), obj (cat mc))}
-  -> Lens mc b c -> Lens mc a b -> Lens mc a c
-lensCompose (MkLens g2 pu2) (MkLens g1 p1) = MkLens (o (cat mc) g2 g1) ?pp
+lensCompose : {cmnd : Comonoid} -> {a, b, c : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))}
+  -> Lens cmnd b c -> Lens cmnd a b -> Lens cmnd a c
+lensCompose (MkLens g2 pu2) (MkLens g1 p1) = MkLens (o (cat (mc cmnd)) g2 g1) ?pp
 
 
---MkLens (g2 . g1) (\(a, z) => p1 a (p2 (g1 a) z))
---
---lensHom : (Type, Type) -> (Type, Type) -> Type
---lensHom (s, t) (a, b) = Lens s t a b
---
+-- Given s x a,  this projects the first element by using comonoid delete
+deleteSecond : (cmnd : Comonoid) -> (a : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))) -> hom (cat (mc cmnd)) (mapObj (x (mc cmnd)) (fst a, snd a)) (fst a)
+deleteSecond cmnd a = let mm = component $ natTrans $ rightUnitor $ mc cmnd
+                          mma = mm $ fst a
+                          --pr = MkProdMor (idd (cat (mc cmnd))) (delete cmnd)
+                      in o (cat (mc cmnd)) mma ?deleteRight
 
---lensCat mc = MkCat (Type, Type)  ?ee ?rr
+idLens : {cmnd : Comonoid} -> {a : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))}
+  -> Lens cmnd a a
+idLens = MkLens
+  (idd (cat (mc cmnd)))
+  (deleteSecond cmnd a)
 
-idLens : {mc : MonoidalCat} -> {a : (obj (cat mc), obj (cat mc))}
-  -> Lens mc a a
-idLens = MkLens (idd (cat mc)) ?tt
-
-lensCat : MonoidalCat -> Cat
-lensCat mc = MkCat (obj (cat mc), (obj (cat mc))) (Lens mc) idLens lensCompose
+lensCom : Comonoid -> Cat
+lensCom cmnd = MkCat
+  (obj (cat (mc cmnd)), (obj (cat (mc cmnd))))
+  (Lens cmnd)
+  idLens
+  lensCompose
