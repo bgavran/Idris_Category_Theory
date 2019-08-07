@@ -26,7 +26,7 @@ categoryOneObject = MkCat () SingletonMorphism id (.) (\_, _, _ => Refl) (\_ => 
 categoryOfCategoriesMonoidal : MonoidalCat
 categoryOfCategoriesMonoidal = MkMonoidalCat
   categoryOfCategories
-  (MkFFunctor ?aa ?rr)
+  (MkFFunctor ?aaaa ?rrrr)
   categoryOneObject
   ?aaaa
   ?bbbb

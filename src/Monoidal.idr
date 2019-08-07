@@ -14,12 +14,18 @@ multiplyOnRight {c} x elem = MkFFunctor
   (\a => mapObj x (a, elem))
   (\f => mapMor x (MkProdMor f (idd c {a=elem})))
 
+-- action on objects is associator of the product?
+fff : {c : Cat} -> (x : FFunctor (productCategory c c) c) -> FFunctor (productCategory c (productCategory c c)) c
+fff {c} (MkFFunctor mO mM) = MkFFunctor (\(x, y) => mO (x, mO y)) ?rr
+
+
 record MonoidalCat where
   constructor MkMonoidalCat
   cat : Cat
   x : FFunctor (productCategory cat cat) cat
   unit : obj cat
   -- TODO add associator
+  --associator : NatIso (productCategory cat (productCategory cat cat)) cat ?nnn ?ggg
   leftUnitor : NatIso cat cat (multiplyOnLeft x unit) (idFunctor {cat=cat})
   rightUnitor : NatIso cat cat (multiplyOnRight x unit) (idFunctor {cat=cat})
 

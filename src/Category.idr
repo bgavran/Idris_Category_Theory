@@ -1,5 +1,7 @@
 module Category
 
+import Utils
+
 record Cat where
   constructor MkCat
   obj : Type
@@ -8,8 +10,8 @@ record Cat where
   o : {a, b, c : obj} -> hom b c -> hom a b -> hom a c
   assoc : {a, b, c, d : obj} -> (f : hom a b) -> (g : hom b c) -> (h : hom c d) ->
       (h `o` g) `o` f = h `o` (g `o` f)
-  leftId : {a, b : obj} -> (f : hom a b) -> f `o` idd = f
-  rightId : {a, b : obj} -> (f : hom a b) -> idd `o` f = f
+  leftId : {a, b : obj} -> (f : hom a b) -> f `o` idd === f
+  rightId : {a, b : obj} -> (f : hom a b) -> idd `o` f === f
 
 TypeMorphism : Type -> Type -> Type
 TypeMorphism a b = a -> b
@@ -31,15 +33,39 @@ prodComp : {cat1, cat2 : Cat} -> {a, b, c : (obj cat1, obj cat2)}
   -> ProdHom cat1 cat2 b c -> ProdHom cat1 cat2 a b -> ProdHom cat1 cat2 a c
 prodComp (MkProdMor bcl bcr) (MkProdMor abl abr) = MkProdMor (o cat1 bcl abl) (o cat2 bcr abr)
 
+prodAssoc : {cat1, cat2 : Cat} -> {a, b, c, d : (obj cat1, obj cat2)}
+  -> (f : ProdHom cat1 cat2 a b)
+  -> (g : ProdHom cat1 cat2 b c)
+  -> (h : ProdHom cat1 cat2 c d)
+  -> (h `prodComp` g) `prodComp` f = h `prodComp` (g `prodComp` f)
+prodAssoc (MkProdMor f1 f2) (MkProdMor g1 g2) (MkProdMor h1 h2)
+  = cong2 MkProdMor (assoc cat1 f1 g1 h1) (assoc cat2 f2 g2 h2)
+
+prodLeftId : {cat1, cat2 : Cat}
+  -> {a, b : (obj cat1, obj cat2)}
+  -> (f : ProdHom cat1 cat2 a b)
+  -> prodComp f (MkProdMor (idd cat1 {a=(fst a)}) (idd cat2 {a=(snd a)})) === f
+prodLeftId (MkProdMor ll rr) = cong2 MkProdMor
+  (leftId cat1 ll)
+  (leftId cat2 rr)
+
+prodRightId : {cat1, cat2 : Cat}
+  -> {a, b : (obj cat1, obj cat2)}
+  -> (f : ProdHom cat1 cat2 a b)
+  -> prodComp (MkProdMor (idd cat1 {a=(fst b)}) (idd cat2 {a=(snd b)})) f === f
+prodRightId (MkProdMor ll rr) = cong2 MkProdMor
+  (rightId cat1 ll)
+  (rightId cat2 rr)
+
 productCategory : Cat -> Cat -> Cat
 productCategory cat1 cat2 = MkCat
   (obj cat1, obj cat2)
   (ProdHom cat1 cat2)
   (MkProdMor (idd cat1) (idd cat2))
   prodComp
-  ?prodAssoc
-  ?prodLeftId
-  ?prodRightId
+  prodAssoc
+  prodLeftId
+  prodRightId
 
 -- FFunctor because it clashes with the name Functor in Idris
 record FFunctor (cat1 : Cat) (cat2 : Cat) where
