@@ -37,9 +37,8 @@ lensCompose (MkLens g2 pu2) (MkLens g1 p1) = MkLens (o (cat (mc cmnd)) g2 g1) ?p
 -- Given s x a,  this projects the first element by using comonoid delete
 deleteSecond : (cmnd : Comonoid) -> (a : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))) -> hom (cat (mc cmnd)) (mapObj (x (mc cmnd)) (fst a, snd a)) (fst a)
 deleteSecond cmnd a = let mm = component $ natTrans $ rightUnitor $ mc cmnd
-                          mma = mm $ fst a
-                          --pr = MkProdMor (idd (cat (mc cmnd))) (delete cmnd)
-                      in o (cat (mc cmnd)) mma ?deleteRight
+                          pr = MkProdMor (idd (cat (mc cmnd))) (delete cmnd)
+                      in o (cat (mc cmnd)) (mm $ fst a) (mapMor (x (mc cmnd)) (fst a, snd a) (fst a, unit (mc cmnd)) pr)
 
 idLens : {cmnd : Comonoid} -> {a : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))}
   -> Lens cmnd a a
