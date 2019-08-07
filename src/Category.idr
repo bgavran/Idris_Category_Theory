@@ -1,7 +1,7 @@
 module Category
 
-%access public export
-%default total
+-- %access public export
+-- %default total
 
 record Cat where
   constructor MkCat
