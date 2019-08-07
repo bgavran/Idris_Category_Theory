@@ -77,6 +77,15 @@ record FFunctor (cat1 : Cat) (cat2 : Cat) where
 idFunctor : {cat : Cat} -> FFunctor cat cat
 idFunctor = MkFFunctor id id
 
+
+productAssociator : FFunctor (productCategory (productCategory c1 c2) c3) (productCategory c1 (productCategory c2 c3))
+productAssociator = MkFFunctor
+  (\x => (fst (fst x), (snd (fst x), snd x)))
+  (\f => MkProdMor (pi1 (pi1 f)) (MkProdMor (pi2 (pi1 f)) (pi2 f)))
+-- if I pattern match here things break?
+--(\((x, y), z) => (x, (y, z)))
+--(\(MkProdMor (MkProdMor ll mm) rr) => (MkProdMor ?lll (MkProdMor ?mmm ?rrr)))
+
 record Isomorphism (cat : Cat) (a : obj cat) (b : obj cat) (f : hom cat a b) where
   constructor MkIso
   inverse : hom cat b a
