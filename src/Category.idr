@@ -72,9 +72,6 @@ record FFunctor (cat1 : Cat) (cat2 : Cat) where
    constructor MkFFunctor
    mapObj : obj cat1 -> obj cat2
    mapMor : {a, b : obj cat1} -> hom cat1 a b -> hom cat2 (mapObj a) (mapObj b)
-   -- the above arguments a, b need to be explicit because in mulitplyOnLeft we
-   -- need to use them in a lambda fn, but idris doesn't support implicit arguments
-   -- in a lambda function
    --preserveIdentity : (a : obj cat1) -> (mapMor a a (idd cat1 {a})) = (idd cat2 {mapObj a})
 
 idFunctor : {cat : Cat} -> FFunctor cat cat
