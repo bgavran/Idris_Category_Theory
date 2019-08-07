@@ -1,24 +1,21 @@
 module Category
 
--- %access public export
--- %default total
-
 record Cat where
   constructor MkCat
   obj : Type
   hom : obj -> obj -> Type
   idd : {a : obj} -> hom a a
   o : {a, b, c : obj} -> hom b c -> hom a b -> hom a c
---  assoc : {a, b, c, d : obj} -> (f : hom a b) -> (g : hom b c) -> (h : hom c d) ->
---      (h `o` g) `o` f = h `o` (g `o` f)
-  --leftId : {a, b : obj} -> (f : hom a b) -> f `o` idd = f
-  --rightId : {a, b : obj} -> (f : hom a b) -> idd `o` f = f
+  assoc : {a, b, c, d : obj} -> (f : hom a b) -> (g : hom b c) -> (h : hom c d) ->
+      (h `o` g) `o` f = h `o` (g `o` f)
+  leftId : {a, b : obj} -> (f : hom a b) -> f `o` idd = f
+  rightId : {a, b : obj} -> (f : hom a b) -> idd `o` f = f
 
 TypeMorphism : Type -> Type -> Type
 TypeMorphism a b = a -> b
 
 typeCat : Cat
-typeCat = MkCat Type TypeMorphism id (.) -- (\_, _, _ => Refl) -- (\_ => Refl) (\_ => Refl)
+typeCat = MkCat Type TypeMorphism id (.) (\_, _, _ => Refl) (\_ => Refl) (\_ => Refl)
 
 record ProdHom
   (cat1 : Cat)
@@ -40,6 +37,9 @@ productCategory cat1 cat2 = MkCat
   (ProdHom cat1 cat2)
   (MkProdMor (idd cat1) (idd cat2))
   prodComp
+  ?prodAssoc
+  ?prodLeftId
+  ?prodRightId
 
 -- FFunctor because it clashes with the name Functor in Idris
 record FFunctor (cat1 : Cat) (cat2 : Cat) where

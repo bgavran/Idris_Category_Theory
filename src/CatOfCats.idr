@@ -7,13 +7,20 @@ functorComposition : {cat1, cat2, cat3 : Cat} -> FFunctor cat2 cat3 -> FFunctor 
 functorComposition g@(MkFFunctor obc _) f@(MkFFunctor oab _) = MkFFunctor (obc . oab) (\a, b => (mapMor g (oab a) (oab b)) . (mapMor f a b))
 
 categoryOfCategories : Cat
-categoryOfCategories = MkCat Cat FFunctor idFunctor functorComposition
+categoryOfCategories = MkCat
+  Cat
+  FFunctor
+  idFunctor
+  functorComposition
+  ?catAssoc
+  ?catLeftId
+  ?catRightId
 
 SingletonMorphism : () -> () -> Type
 SingletonMorphism x y = () -> ()
 
 categoryOneObject : Cat
-categoryOneObject = MkCat () SingletonMorphism id (.)
+categoryOneObject = MkCat () SingletonMorphism id (.) (\_, _, _ => Refl) (\_ => Refl) (\_ => Refl)
 
 categoryOfCategoriesMonoidal : MonoidalCat
 categoryOfCategoriesMonoidal = MkMonoidalCat

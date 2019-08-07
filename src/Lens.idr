@@ -53,3 +53,6 @@ lensCom cmnd = MkCat
   (Lens cmnd)
   idLens
   lensCompose
+  ?lensAssoc
+  ?lensLeftId
+  ?lensRightId
