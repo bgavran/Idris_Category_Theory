@@ -26,19 +26,20 @@ record Lens
     where
     constructor MkLens
     get : hom (cat (mc lensCom)) (fst i') (fst o')
-    put : hom (cat (mc lensCom)) (mapObj (x (mc lensCom)) ((fst i'), (snd o'))) (fst o')
-
+    put : hom (cat (mc lensCom)) (mapObj (x (mc lensCom)) ((fst i'), (snd o'))) (snd i')
 
 lensCompose : {cmnd : Comonoid} -> {a, b, c : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))}
   -> Lens cmnd b c -> Lens cmnd a b -> Lens cmnd a c
-lensCompose (MkLens g2 pu2) (MkLens g1 p1) = MkLens (o (cat (mc cmnd)) g2 g1) ?pp
+lensCompose (MkLens g2 p2) (MkLens g1 p1) = MkLens
+  (o (cat (mc cmnd)) g2 g1)
+  ?composePut
 
-
--- Given s x a,  this projects the first element by using comonoid delete
-deleteSecond : (cmnd : Comonoid) -> (a : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))) -> hom (cat (mc cmnd)) (mapObj (x (mc cmnd)) (fst a, snd a)) (fst a)
-deleteSecond cmnd a = let mm = component $ natTrans $ rightUnitor $ mc cmnd
-                          pr = MkProdMor (idd (cat (mc cmnd))) (delete cmnd)
-                      in o (cat (mc cmnd)) (mm $ fst a) (mapMor (x (mc cmnd)) (fst a, snd a) (fst a, unit (mc cmnd)) pr)
+  -- (mapMor (x (mc cmnd)) (mapObj (x (mc cmnd)) (fst a, fst a)) ((mapObj (x (mc cmnd)) (fst a, fst a)), fst a) (mapMor )  )
+-- Given a x b,  this projects the second element by using comonoid delete
+deleteSecond : (cmnd : Comonoid) -> (a : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))) -> hom (cat (mc cmnd)) (mapObj (x (mc cmnd)) (fst a, snd a)) (snd a)
+deleteSecond cmnd a = let mm = component $ natTrans $ leftUnitor $ mc cmnd
+                          pr = MkProdMor (delete cmnd) (idd (cat (mc cmnd)))
+                      in o (cat (mc cmnd)) (mm $ snd a) (mapMor (x (mc cmnd)) (fst a, snd a) (unit (mc cmnd), snd a) pr)
 
 idLens : {cmnd : Comonoid} -> {a : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))}
   -> Lens cmnd a a
