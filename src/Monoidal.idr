@@ -1,6 +1,7 @@
 module Monoidal
 
 import Category
+import Product
 
 %hide Prelude.(||) -- because I'm defining my custom || operator
 
@@ -14,9 +15,11 @@ multiplyOnRight {c} x elem = MkFFunctor
   (\a => mapObj x (a, elem))
   (\f => mapMor x (MkProdMor f (idd c {a=elem})))
 
--- action on objects is associator of the product?
-fff : {c : Cat} -> (x : FFunctor (productCategory c c) c) -> FFunctor (productCategory c (productCategory c c)) c
-fff {c} (MkFFunctor mO mM) = MkFFunctor (\(x, y) => mO (x, mO y)) ?rr
+multiplyTwiceFromLeft : {c : Cat} -> FFunctor (productCategory c c) c -> FFunctor (productCategory (productCategory c c) c) c
+multiplyTwiceFromLeft f =  f `functorComposition` (productFunctor f idFunctor)
+
+multiplyTwiceAssociator : {c : Cat} -> FFunctor (productCategory c c) c -> FFunctor (productCategory (productCategory c c) c) c
+multiplyTwiceAssociator f = (f `functorComposition` (productFunctor idFunctor f)) `functorComposition` productAssociator
 
 
 record MonoidalCat where
@@ -24,8 +27,8 @@ record MonoidalCat where
   cat : Cat
   x : FFunctor (productCategory cat cat) cat
   unit : obj cat
-  -- TODO add associator
-  --associator : NatIso (productCategory cat (productCategory cat cat)) cat ?nnn ?ggg
+  associator : NatIso (productCategory (productCategory cat cat) cat) 
+      cat (multiplyTwiceFromLeft x) (multiplyTwiceAssociator x)
   leftUnitor : NatIso cat cat (multiplyOnLeft x unit) (idFunctor {cat=cat})
   rightUnitor : NatIso cat cat (multiplyOnRight x unit) (idFunctor {cat=cat})
 
