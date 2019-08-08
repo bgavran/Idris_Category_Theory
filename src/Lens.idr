@@ -2,6 +2,7 @@ module Lens
 
 import Category
 import Monoidal
+import Product
 
 %hide Prelude.(||)
 
@@ -55,10 +56,13 @@ lensCompose (MkLens g2 p2) (MkLens g1 p1) = MkLens
 
 
 -- Given a x b,  this projects the second element by using comonoid delete
-deleteSecond : (cmnd : Comonoid) -> (a : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))) -> hom (cat (mc cmnd)) (mapObj (x (mc cmnd)) (fst a, snd a)) (snd a)
+deleteSecond : (cmnd : Comonoid)
+  -> (a : (obj (cat (mc cmnd)), obj (cat (mc cmnd))))
+  -> hom (cat (mc cmnd)) (mapObj (x (mc cmnd)) (fst a, snd a)) (snd a)
 deleteSecond cmnd a = let mm = component $ natTrans $ leftUnitor $ mc cmnd
                           pr = MkProdMor (delete cmnd) (idd (cat (mc cmnd)))
-                      in o (cat (mc cmnd)) (mm $ snd a) (mapMor (x (mc cmnd)) {a=(fst a, snd a)} {b=(unit (mc cmnd), snd a)} pr)
+                          morr = mapMor (x (mc cmnd)) {a=(fst a, snd a)} {b=(unit (mc cmnd), snd a)} pr
+                      in o (cat (mc cmnd)) (mm $ snd a) morr
 
 idLens : {cmnd : Comonoid} -> {a : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))}
   -> Lens cmnd a a
