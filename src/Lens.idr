@@ -40,12 +40,20 @@ composePut : (cmnd : Comonoid)
   -> hom (cat (mc cmnd)) (mapObj (x (mc cmnd)) (fst a, snd c)) (snd a)
 composePut cmnd (a, a') (b, b') (c, c') p2 g2 p1 g1
   = o (cat (mc cmnd))
-    ?zz
-    (mapMor (x (mc cmnd)) {a=(a, c')} {b=(a || b, c')}
-      (MkProdMor (o (cat (mc cmnd))
-        (mapMor (x (mc cmnd)) (MkProdMor (idd (cat (mc cmnd)) {a=a}) g1))
-        (copy cmnd)) (idd (cat (mc cmnd))))
-      )
+    (o (cat (mc cmnd))
+      (o (cat (mc cmnd))
+        ?bc
+        ?ab)
+      (mapMor (x (mc cmnd)) {a=((a, a), c')} {b=((a, b), c')}
+        (MkProdMor
+          (mapMor (x (mc cmnd)) {a=(a, a)} {b=(a, b)} (MkProdMor (idd (cat (mc cmnd))) g1))
+          (idd (cat (mc cmnd))))))
+    (mapMor (x (mc cmnd)) {a=a} {b=((a, a), c')} (MkProdMor (copy cmnd) (idd (cat (mc cmnd)))))
+    --(mapMor (x (mc cmnd)) {a=(a, c')} {b=(a || b, c')}
+    --  (MkProdMor (o (cat (mc cmnd))
+    --    (mapMor (x (mc cmnd)) (MkProdMor (idd (cat (mc cmnd)) {a=a}) g1))
+    --    (copy cmnd)) (idd (cat (mc cmnd))))
+    --  )
 
 
 lensCompose : {cmnd : Comonoid} -> {a, b, c : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))}
