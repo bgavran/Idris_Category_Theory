@@ -14,10 +14,12 @@ record ProdHom
     pi1 : hom cat1 (fst a) (fst b)
     pi2 : hom cat2 (snd a) (snd b)
 
+public export
 prodComp : {cat1, cat2 : Cat} -> {a, b, c : (obj cat1, obj cat2)}
   -> ProdHom cat1 cat2 b c -> ProdHom cat1 cat2 a b -> ProdHom cat1 cat2 a c
 prodComp (MkProdMor bcl bcr) (MkProdMor abl abr) = MkProdMor (o cat1 bcl abl) (o cat2 bcr abr)
 
+public export
 prodAssoc : {cat1, cat2 : Cat} -> {a, b, c, d : (obj cat1, obj cat2)}
   -> (f : ProdHom cat1 cat2 a b)
   -> (g : ProdHom cat1 cat2 b c)
@@ -26,6 +28,7 @@ prodAssoc : {cat1, cat2 : Cat} -> {a, b, c, d : (obj cat1, obj cat2)}
 prodAssoc (MkProdMor f1 f2) (MkProdMor g1 g2) (MkProdMor h1 h2)
   = cong2 MkProdMor (assoc cat1 f1 g1 h1) (assoc cat2 f2 g2 h2)
 
+public export
 prodLeftId : {cat1, cat2 : Cat}
   -> {a, b : (obj cat1, obj cat2)}
   -> (f : ProdHom cat1 cat2 a b)
@@ -34,6 +37,7 @@ prodLeftId (MkProdMor ll rr) = cong2 MkProdMor
   (leftId cat1 ll)
   (leftId cat2 rr)
 
+public export
 prodRightId : {cat1, cat2 : Cat}
   -> {a, b : (obj cat1, obj cat2)}
   -> (f : ProdHom cat1 cat2 a b)
@@ -53,6 +57,10 @@ productCategory cat1 cat2 = MkCat
   prodLeftId
   prodRightId
 
+-- is this the correct to do this?
+typeProductCat : Cat
+typeProductCat = productCategory typeCat typeCat
+
 
 public export
 productAssociator : FFunctor (productCategory (productCategory c1 c2) c3) (productCategory c1 (productCategory c2 c3))
@@ -62,10 +70,22 @@ productAssociator = MkFFunctor
 -- if I pattern match here things break?
 --(\((x, y), z) => (x, (y, z)))
 --(\(MkProdMor (MkProdMor ll mm) rr) => (MkProdMor ?lll (MkProdMor ?mmm ?rrr)))
+  (\a => Refl)
+  (\ff, gg => trans ?dj ?fk)
+  --(\ff, gg => cong2 MkProdMor ?prodAssocComp1 (cong2 MkProdMor ?prodAssocComp2 ?prodAssocComp3))
+
+
+
 
 public export
 productFunctor : FFunctor cat1 cat2 -> FFunctor cat3 cat4
   -> FFunctor (productCategory cat1 cat3) (productCategory cat2 cat4)
-productFunctor (MkFFunctor o1 m1) (MkFFunctor o2 m2) = MkFFunctor
+productFunctor (MkFFunctor o1 m1 id1 comp1) (MkFFunctor o2 m2 id2 comp2) = MkFFunctor
   (\x => (o1 (fst x), o2 (snd x)))
   (\(MkProdMor ll rr) => MkProdMor (m1 ll) (m2 rr))
+  (\a => let zzzz = 1 -- this wont compile without the 'let'?? (preserve order of unification commit?)
+         in cong2 MkProdMor (id1 $ fst a) (id2 $ snd a))
+  (\ff, gg => ?prodFunctComp)
+
+--feq : (fun : FFunctor (productCategory cat1 cat3) (productCategory cat2 cat4))
+--  -> (mapObj (x cc) (mapObj (productFunctor (x cc) (MkFFunctor AAA)) ((a, b), c)))

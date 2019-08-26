@@ -1,33 +1,11 @@
 module Monoidal
 
 import Category
+import NaturalTransformation
 import Product
+import MonoidalHelpers
 
 %hide Prelude.(||) -- because I'm defining my custom || operator
-
-public export
-multiplyOnLeft : {c : Cat} -> (x : FFunctor (productCategory c c) c) -> (elem : obj c) -> FFunctor c c
-multiplyOnLeft {c} x elem = MkFFunctor
-  (\a => mapObj x (elem, a))
-  (\f => mapMor x (MkProdMor (idd c {a=elem}) f))
-
-public export
-multiplyOnRight : {c : Cat} -> (x : FFunctor (productCategory c c) c) -> (elem : obj c) -> FFunctor c c
-multiplyOnRight {c} x elem = MkFFunctor
-  (\a => mapObj x (a, elem))
-  (\f => mapMor x (MkProdMor f (idd c {a=elem})))
-
-multiplyTwiceFromLeft : {c : Cat} -> FFunctor (productCategory c c) c -> FFunctor (productCategory (productCategory c c) c) c
-multiplyTwiceFromLeft f =
-  f `functorComposition`
-  (productFunctor f idFunctor)
-
-multiplyTwiceAssociator : {c : Cat} -> FFunctor (productCategory c c) c -> FFunctor (productCategory (productCategory c c) c) c
-multiplyTwiceAssociator f =
-  (f `functorComposition`
-    (productFunctor idFunctor f)) `functorComposition`
-  productAssociator
-
 
 public export
 record MonoidalCat where
@@ -35,10 +13,42 @@ record MonoidalCat where
   cat : Cat
   x : FFunctor (productCategory cat cat) cat
   unit : obj cat
-  associator : NatIso (productCategory (productCategory cat cat) cat)
-      cat (multiplyTwiceFromLeft x) (multiplyTwiceAssociator x)
+  associator : NatIso (productCategory (productCategory cat cat) cat) cat
+    (multiplyTwiceFromLeft x) (multiplyTwiceAssociator x)
   leftUnitor : NatIso cat cat (multiplyOnLeft x unit) (idFunctor {cat=cat})
   rightUnitor : NatIso cat cat (multiplyOnRight x unit) (idFunctor {cat=cat})
+
+
+hhh : (cc : MonoidalCat) -> (a, b, c : obj (cat cc))
+   -> hom (cat cc) (mapObj (x cc) (mapObj (x cc) (a, b), c)) (mapObj (x cc) (a, mapObj (x cc) (b, c)))
+   ---> hom (cat c)
+hhh cc a b c = let zz = component (natTrans $ associator cc) ((a, b), c)
+               in ?zzz
+
+--zz : hom (cat cc) (mapObj (x cc) (mapObj (productFunctor (x cc) (MkFFunctor AAA)) ((a, b), c)))
+--                  (mapObj (x cc) (mapObj (productFunctor (MkFFunctor AAA) (x cc)) (a, (b, c))))
+-----------           into          ----------------------------
+--zz : hom (cat cc) (mapObj (x cc) (mapObj (x cc) (a, b), c))
+--                  (mapObj (x cc) (a, mapObj (x cc) (b, c)))
+--
+--
+
+
+public export
+leftUnitorMap : (cc : MonoidalCat)
+  -> {a : obj (cat (cc))}
+  -> hom (cat cc) (mapObj (x cc) (unit cc, a)) a
+leftUnitorMap cc {a} = component (natTrans $ leftUnitor cc) a
+
+
+--typeMonoidal : MonoidalCat
+--typeMonoidal = MkMonoidalCat
+--  typeCat
+--  ?cartesianProdType
+--  ()
+--  ?typeMonoidald
+--  ?typeMonoidale
+--  ?typeMonoidalf
 
 -- Monoidal product on objects
 public export
@@ -47,12 +57,16 @@ public export
 (||) {mcat} a b = mapObj (x mcat) (a, b)
 
 
-public export
-record LaxMonoidalFunctor (cat1 : MonoidalCat) (cat2 : MonoidalCat) where
-  constructor MkMonoidalFunctor
-  ffunctor : FFunctor (cat cat1) (cat cat2)
-  laxUnit : hom (cat cat2) (unit cat2) (mapObj ffunctor (unit cat1))
+--public export
+--record LaxMonoidalFunctor (cat1 : MonoidalCat) (cat2 : MonoidalCat) where
+--  constructor MkMonoidalFunctor
+--  ffunctor : FFunctor (cat cat1) (cat cat2)
+--  laxUnit : hom (cat cat2) (unit cat2) (mapObj ffunctor (unit cat1))
   --laxTensor : NatTrans (productCategory cat1 cat1) cat2
 
 swapFunctor : FFunctor (productCategory cat1 cat2) (productCategory cat2 cat1)
-swapFunctor = MkFFunctor (\o => (snd o, fst o)) (\(MkProdMor f g) => MkProdMor g f)
+swapFunctor = MkFFunctor
+  (\o => (snd o, fst o))
+  (\(MkProdMor f g) => MkProdMor g f)
+  ?vbvbv
+  ?nmnm

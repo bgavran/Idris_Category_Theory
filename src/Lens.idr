@@ -1,6 +1,7 @@
 module Lens
 
 import Category
+import NaturalTransformation
 import Monoidal
 import Product
 import Comonoid
@@ -24,6 +25,19 @@ record Lens
     get : hom (cat (mc lensCom)) (fst i') (fst o')
     put : hom (cat (mc lensCom)) (mapObj (x (mc lensCom)) ((fst i'), (snd o'))) (snd i')
 
+
+--(mapObj
+--    (functorComposition (x cc) (productFunctor (x cc) idFunctor))
+--    ((a, b), c))
+--(mapObj
+--    (functorComposition
+--        (functorComposition (x cc) (productFunctor idFunctor (x cc)))
+--        productAssociator)
+--    ((a, b), c))
+
+--(mapObj (x cc) (mapObj (x cc) (a, b), c))     -- ((a || b) || c)
+--(mapObj (x cc) (a, mapObj (x cc) (b, c)))     -- (a || (b || c))
+
 composePut : (cmnd : Comonoid)
   -> (aa', bb', cc' : (obj (cat (mc cmnd)), obj (cat (mc cmnd))))
   -> hom (cat $ mc cmnd) (mapObj (x $ mc cmnd) (fst bb', snd cc')) (snd bb')
@@ -37,19 +51,16 @@ composePut cmnd (a, a') (b, b') (c, c') p2 g2 p1 g1
       (o (cat $ mc cmnd)
         p1
         (o (cat $ mc cmnd)
-          (mapMor (x $ mc cmnd) {a=(a, (b, c'))} {b=(a, b')} $ MkProdMor (idd $ cat $ mc cmnd) p2)
-          (let vv = component (natTrans $ associator $ mc cmnd) ((a, b), c')
-               yy = inverse $ natIso (associator (mc cmnd)) ((a, b), c')
-           in ?ab))
+          (mapMor (x $ mc cmnd) {a=(a, (b, c'))} $ MkProdMor (idd $ cat $ mc cmnd) p2)
+          ?composePutLast)
         )
       (mapMor (x $ mc cmnd) {a=((a, a), c')} {b=((a, b), c')}
         $ MkProdMor
-          (mapMor (x $ mc cmnd) {a=(a, a)} {b=(a, b)} $ MkProdMor (idd $ cat $ mc cmnd) g1)
+          (mapMor (x $ mc cmnd) {b=(a, b)} $ MkProdMor (idd $ cat $ mc cmnd) g1)
           (idd $ cat $ mc cmnd)
       )
     )
-    $ mapMor (x $ mc cmnd) {a=(a, c')} {b=((a, a), c')} $ MkProdMor (copy cmnd) (idd $ cat $ mc cmnd)
-
+    $ mapMor (x $ mc cmnd) {b=((a, a), c')} $ MkProdMor (copy cmnd) (idd $ cat $ mc cmnd)
 
 lensCompose : {cmnd : Comonoid} -> {a, b, c : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))}
   -> Lens cmnd b c -> Lens cmnd a b -> Lens cmnd a c
