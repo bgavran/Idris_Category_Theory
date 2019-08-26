@@ -19,11 +19,10 @@ record MonoidalCat where
   rightUnitor : NatIso cat cat (multiplyOnRight x unit) (idFunctor {cat=cat})
 
 
-hhh : (cc : MonoidalCat) -> (a, b, c : obj (cat cc))
+associatorMap : (cc : MonoidalCat) -> (a, b, c : obj (cat cc))
    -> hom (cat cc) (mapObj (x cc) (mapObj (x cc) (a, b), c)) (mapObj (x cc) (a, mapObj (x cc) (b, c)))
-   ---> hom (cat c)
-hhh cc a b c = let zz = component (natTrans $ associator cc) ((a, b), c)
-               in ?zzz
+associatorMap cc a b c = let zz = component (natTrans $ associator cc) ((a, b), c)
+                         in ?zzz
 
 --zz : hom (cat cc) (mapObj (x cc) (mapObj (productFunctor (x cc) (MkFFunctor AAA)) ((a, b), c)))
 --                  (mapObj (x cc) (mapObj (productFunctor (MkFFunctor AAA) (x cc)) (a, (b, c))))
@@ -32,14 +31,6 @@ hhh cc a b c = let zz = component (natTrans $ associator cc) ((a, b), c)
 --                  (mapObj (x cc) (a, mapObj (x cc) (b, c)))
 --
 --
-
-
-public export
-leftUnitorMap : (cc : MonoidalCat)
-  -> {a : obj (cat (cc))}
-  -> hom (cat cc) (mapObj (x cc) (unit cc, a)) a
-leftUnitorMap cc {a} = component (natTrans $ leftUnitor cc) a
-
 
 --typeMonoidal : MonoidalCat
 --typeMonoidal = MkMonoidalCat
