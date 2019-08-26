@@ -70,19 +70,19 @@ lensCompose (MkLens g2 p2) (MkLens g1 p1) = MkLens
 
 
 -- Given a x b,  this projects the second element by using comonoid delete
-deleteSecond : (cmnd : Comonoid)
+projectSecond : (cmnd : Comonoid)
   -> (a : (obj (cat (mc cmnd)), obj (cat (mc cmnd))))
   -> hom (cat (mc cmnd)) (mapObj (x (mc cmnd)) (fst a, snd a)) (snd a)
-deleteSecond cmnd a = let mm = component $ natTrans $ leftUnitor $ mc cmnd
-                          pr = MkProdMor (delete cmnd) (idd (cat (mc cmnd)))
-                          morr = mapMor (x (mc cmnd)) {a=(fst a, snd a)} {b=(unit (mc cmnd), snd a)} pr
-                      in o (cat (mc cmnd)) (mm $ snd a) morr
+projectSecond cmnd a = let mm = component $ natTrans $ leftUnitor $ mc cmnd
+                           pr = MkProdMor (delete cmnd) (idd (cat (mc cmnd)))
+                           morr = mapMor (x (mc cmnd)) {a=(fst a, snd a)} {b=(unit (mc cmnd), snd a)} pr
+                       in o (cat (mc cmnd)) (mm $ snd a) morr
 
 idLens : {cmnd : Comonoid} -> {a : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))}
   -> Lens cmnd a a
 idLens = MkLens
   (idd (cat (mc cmnd)))
-  (deleteSecond cmnd a)
+  (projectSecond cmnd a)
 
 lensLeftId : (f : Lens cmnd a b) -> lensCompose f idLens === f
 lensLeftId (MkLens get put) = ?lensLeftId_rhs_1
