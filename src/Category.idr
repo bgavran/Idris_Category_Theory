@@ -69,6 +69,7 @@ record Isomorphism (cat : Cat) (a : obj cat) (b : obj cat) (f : hom cat a b) whe
   constructor MkIso
   inverse : hom cat b a
 
+public export
 dualCategory : Cat -> Cat
 dualCategory c = MkCat
   (obj c)

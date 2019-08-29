@@ -10,7 +10,7 @@ catAssoc : {a, b, c, d : Cat}
 catAssoc {a} {d} f g h = functorEq {cat1=a} {cat2=d}
   (functorComposition (functorComposition h g) f)
   (functorComposition h (functorComposition g f))
-  (\x => Refl) -- why is this Refl?
+  (\x => Refl)
   (\x => Refl)
 
 catRightId : {a, b : Cat}
