@@ -45,7 +45,14 @@ SingletonMorphism : () -> () -> Type
 SingletonMorphism x y = () -> ()
 
 categoryOneObject : Cat
-categoryOneObject = MkCat () SingletonMorphism id (.) (\_, _, _ => Refl) (\_ => Refl) (\_ => Refl)
+categoryOneObject = MkCat
+  ()
+  SingletonMorphism
+  id
+  (.)
+  (\_, _, _ => Refl)
+  (\_ => Refl)
+  (\_ => Refl)
 
 categoryOfCategoriesMonoidal : MonoidalCat
 categoryOfCategoriesMonoidal = MkMonoidalCat

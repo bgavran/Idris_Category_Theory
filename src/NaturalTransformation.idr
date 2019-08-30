@@ -7,6 +7,7 @@ public export
 record NatTrans (cat1 : Cat) (cat2 : Cat) (f : FFunctor cat1 cat2) (g : FFunctor cat1 cat2) where
   constructor MkNatTrans
   component : (a : obj cat1) -> hom cat2 (mapObj f a) (mapObj g a)
+  -- todo add coherence condition
 
 
 public export

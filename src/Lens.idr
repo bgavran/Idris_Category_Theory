@@ -81,6 +81,12 @@ lensLeftId {cmnd} (MkLens get put) = cong2 MkLens
   (leftId (cat (mc cmnd)) get)
   ?lensLeftId_rhs_2
 
+lensRightId : {cmnd : Comonoid} -> {a, b : (obj (cat (mc cmnd)), obj (cat (mc cmnd)))}
+  -> (f : Lens cmnd a b) -> (idLens {cmnd=cmnd}) `lensCompose` f === f
+lensRightId {cmnd} (MkLens get put) = cong2 MkLens
+  (rightId (cat (mc cmnd)) get)
+  ?lensRightId_rhs_2
+
 lensCom : Comonoid -> Cat
 lensCom cmnd = MkCat
   (obj (cat (mc cmnd)), (obj (cat (mc cmnd))))
@@ -89,4 +95,4 @@ lensCom cmnd = MkCat
   lensCompose
   ?lensAssoc
   lensLeftId
-  ?lensRightId
+  lensRightId

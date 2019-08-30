@@ -13,7 +13,10 @@ record Cat where
     ->         b `hom` c
     -> a `hom` b
     -> a     `hom`     c
-  assoc : {a, b, c, d : obj} -> (f : hom a b) -> (g : hom b c) -> (h : hom c d)
+  assoc : {a, b, c, d : obj}
+    -> (f : hom a b)
+    -> (g : hom    b c)
+    -> (h : hom      c d)
     -> (h `o`  g)`o` f
     === h `o` (g `o` f)
   leftId  : {a, b : obj} -> (f : hom a b) ->         f `o` idd === f
