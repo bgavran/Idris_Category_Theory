@@ -4,6 +4,7 @@ import Category
 import NaturalTransformation
 import Product
 import MonoidalHelpers
+import Utils
 
 %hide Prelude.(||) -- because I'm defining my custom || operator
 
@@ -19,10 +20,15 @@ record MonoidalCat where
   rightUnitor : NatIso cat cat (multiplyOnRight x unit) (idFunctor {cat=cat})
 
 
+-- basically I want to show there's a morphism ((A x B) x C) -> (A x (B x C))
+public export
 associatorMap : (cc : MonoidalCat) -> (a, b, c : obj (cat cc))
    -> hom (cat cc) (mapObj (x cc) (mapObj (x cc) (a, b), c)) (mapObj (x cc) (a, mapObj (x cc) (b, c)))
 associatorMap cc a b c = let zz = component (natTrans $ associator cc) ((a, b), c)
+                             --yy = rewriteProductFunctor (a, b) c (x cc) (idFunctor {cat=(cat cc)})
+                             --xx = rewrite yy in zz
                          in ?zzz
+
 
 --zz : hom (cat cc) (mapObj (x cc) (mapObj (productFunctor (x cc) (MkFFunctor AAA)) ((a, b), c)))
 --                  (mapObj (x cc) (mapObj (productFunctor (MkFFunctor AAA) (x cc)) (a, (b, c))))

@@ -52,7 +52,8 @@ composePut cmnd (a, a') (b, b') (c, c') p2 g2 p1 g1
         p1
         (o (cat $ mc cmnd)
           (mapMor (x $ mc cmnd) {a=(a, (b, c'))} $ MkProdMor (idd $ cat $ mc cmnd) p2)
-          ?composePutLast)
+          (associatorMap (mc cmnd) a b c')
+          )
         )
       (mapMor (x $ mc cmnd) {a=((a, a), c')} {b=((a, b), c')}
         $ MkProdMor
