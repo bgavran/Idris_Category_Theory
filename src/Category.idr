@@ -71,6 +71,8 @@ public export
 record Isomorphism (cat : Cat) (a : obj cat) (b : obj cat) (f : hom cat a b) where
   constructor MkIso
   inverse : hom cat b a
+  rightInverse : o cat {a=a} {b=b} {c=a} inverse f === idd cat {a=a}
+  leftInverse : o cat {a=b} {b=a} {c=b} f inverse === idd cat {a=b}
 
 public export
 dualCategory : Cat -> Cat
