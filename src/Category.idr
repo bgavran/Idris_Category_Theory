@@ -44,7 +44,8 @@ public export
 functorEq : {cat1, cat2 : Cat}
   -> (fun1, fun2 : FFunctor cat1 cat2)
   -> ((a : obj cat1) -> (mapObj fun1 a === mapObj fun2 a))
-  -> ({a, b : obj cat1} -> (f : hom cat1 a b) -> (mapMor fun1 {a=a} {b=b} f ~=~ mapMor fun2 {a=a} {b=b} f))
+  -> ({a, b : obj cat1} -> (f : hom cat1 a b)
+  -> (mapMor fun1 {a=a} {b=b} f ~=~ mapMor fun2 {a=a} {b=b} f))
   -> fun1 === fun2
 functorEq fun1 fun2 f g = believe_me ()
 
