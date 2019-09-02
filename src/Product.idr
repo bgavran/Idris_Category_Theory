@@ -16,8 +16,12 @@ record ProdHom
 
 public export
 prodComp : {cat1, cat2 : Cat} -> {a, b, c : (obj cat1, obj cat2)}
-  -> ProdHom cat1 cat2 b c -> ProdHom cat1 cat2 a b -> ProdHom cat1 cat2 a c
-prodComp (MkProdMor bcl bcr) (MkProdMor abl abr) = MkProdMor (o cat1 bcl abl) (o cat2 bcr abr)
+  -> ProdHom cat1 cat2   b c
+  -> ProdHom cat1 cat2 a b
+  -> ProdHom cat1 cat2 a   c
+prodComp g f = MkProdMor (o cat1 (pi1 g) (pi1 f)) (o cat2 (pi2 g) (pi2 f))
+--prodComp (MkProdMor bcl bcr) (MkProdMor abl abr)
+--  = MkProdMor (o cat1 bcl abl) (o cat2 bcr abr)
 
 public export
 prodAssoc : {cat1, cat2 : Cat} -> {a, b, c, d : (obj cat1, obj cat2)}
@@ -87,5 +91,11 @@ productFunctor (MkFFunctor o1 m1 id1 comp1) (MkFFunctor o2 m2 id2 comp2) = MkFFu
          in cong2 MkProdMor (id1 $ fst a) (id2 $ snd a))
   (\ff, gg => ?prodFunctComp)
 
---feq : (fun : FFunctor (productCategory cat1 cat3) (productCategory cat2 cat4))
---  -> (mapObj (x cc) (mapObj (productFunctor (x cc) (MkFFunctor AAA)) ((a, b), c)))
+
+swapFunctor : FFunctor (productCategory cat1 cat2) (productCategory cat2 cat1)
+swapFunctor = MkFFunctor
+  (\o => (snd o, fst o))
+  (\(MkProdMor f g) => MkProdMor g f)
+  --(\f => MkProdMor (pi2 f) (pi1 f))
+  (\_ => Refl)
+  (\_, _ => Refl)
