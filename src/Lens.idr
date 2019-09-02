@@ -40,7 +40,8 @@ composePut cmnd (a, a') (b, b') (c, c') p2 g2 p1 g1
         p1
         (o (cat $ mc cmnd)
           (mapMor (x $ mc cmnd) {a=(a, (b, c'))} $ MkProdMor (idd $ cat $ mc cmnd) p2)
-          (associatorMap (mc cmnd) a b c')
+          (let done = component (forward $ associator $ mc cmnd) ((a, b), c)
+           in ?donee) -- if I fill the hole the compiler hangs
           )
         )
       (mapMor (x $ mc cmnd) {a=((a, a), c')} {b=((a, b), c')}
