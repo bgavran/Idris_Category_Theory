@@ -5,7 +5,10 @@ import NaturalTransformation
 import Product
 
 public export
-multiplyOnLeft : {c : Cat} -> (x : FFunctor (productCategory c c) c) -> (elem : obj c) -> FFunctor c c
+multiplyOnLeft : {c : Cat}
+  -> (x : FFunctor (productCategory c c) c)
+  -> (elem : obj c)
+  -> FFunctor c c
 multiplyOnLeft {c} x elem = MkFFunctor
   (\a => mapObj x (elem, a))
   (\f => mapMor x (MkProdMor (idd c {a=elem}) f))
