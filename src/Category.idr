@@ -69,11 +69,12 @@ functorComposition g f = MkFFunctor
 
 
 public export
-record Isomorphism (cat : Cat) (a : obj cat) (b : obj cat) (f : hom cat a b) where
+record Isomorphism (cat : Cat) (a : obj cat) (b : obj cat) where
   constructor MkIso
+  forward : hom cat a b
   inverse : hom cat b a
-  rightInverse : o cat {a=a} {b=b} {c=a} inverse f === idd cat {a=a}
-  leftInverse : o cat {a=b} {b=a} {c=b} f inverse === idd cat {a=b}
+  rightInverse : o cat {a=a} {b=b} {c=a}         inverse forward === idd cat {a=a}
+  leftInverse  : o cat {a=b} {b=a} {c=b} forward inverse         === idd cat {a=b}
 
 public export
 dualCategory : Cat -> Cat

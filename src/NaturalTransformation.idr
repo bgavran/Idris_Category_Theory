@@ -4,11 +4,21 @@ import Category
 import Utils
 
 public export
-record NatTrans (cat1 : Cat) (cat2 : Cat) (f : FFunctor cat1 cat2) (g : FFunctor cat1 cat2) where
-  constructor MkNatTrans
-  component : (a : obj cat1) -> hom cat2 (mapObj f a) (mapObj g a)
-  -- todo add coherence condition
-
+record NatTrans
+  (cat1 : Cat)
+  (cat2 : Cat)
+  (fun1 : FFunctor cat1 cat2)
+  (fun2 : FFunctor cat1 cat2)
+  where
+    constructor MkNatTrans
+    component : (a : obj cat1) -> hom cat2 (mapObj fun1 a) (mapObj fun2 a)
+    naturality : {a, b : obj cat1} -> (f : hom cat1 a b)
+      -> o cat2 {a=mapObj fun1 a} {b=mapObj fun1 b} {c=mapObj fun2 b}
+        (component b)
+        (mapMor fun1 {a=a} {b=b} f)
+      === o cat2 {a=mapObj fun1 a} {b=mapObj fun2 a} {c=mapObj fun2 b}
+        (mapMor fun2 {a=a} {b=b} f)
+        (component a)
 
 public export
 natTransEq : (cat1, cat2 : Cat)
@@ -18,20 +28,23 @@ natTransEq : (cat1, cat2 : Cat)
   -> natTrans1 === natTrans2
 natTransEq cat1 cat2 f g natTrans1 natTrans2 f1 = believe_me ()
 
-
 public export
 idNatTrans : {cat1, cat2 : Cat} -> {f1 : FFunctor cat1 cat2}
   -> NatTrans cat1 cat2 f1 f1
-idNatTrans {cat2} = MkNatTrans $ \a => idd cat2
-
+idNatTrans {cat2} = MkNatTrans
+  (\a => idd cat2)
+  (\ff => trans (rightId cat2 $ mapMor f1 ff) (sym $ leftId cat2 $ mapMor f1 ff))
 
 public export
 compNatTrans : {cat1, cat2 : Cat} -> {f1, f2, f3 : FFunctor cat1 cat2}
   -> NatTrans cat1 cat2 f2 f3
   -> NatTrans cat1 cat2 f1 f2
   -> NatTrans cat1 cat2 f1 f3
-compNatTrans (MkNatTrans g) (MkNatTrans f)
-  = MkNatTrans $ \a => o cat2 (g a) (f a)
+compNatTrans (MkNatTrans g pg) (MkNatTrans f pf) = MkNatTrans
+  (\a => o cat2 (g a) (f a))
+  (\ff => let ww = pg ff
+              yy = pf ff
+          in ?pgpf)
 
 
 public export
@@ -77,10 +90,3 @@ functorCategory c1 c2 = MkCat
   assocNatTrans
   leftIdNatTrans
   rightIdNatTrans
-
-
-public export
-record NatIso (cat1 : Cat) (cat2 : Cat) (f : FFunctor cat1 cat2) (g : FFunctor cat1 cat2) where
-  constructor MkNatIso
-  natTrans : NatTrans cat1 cat2 f g
-  natIso : (a : obj cat1) -> Isomorphism cat2 (mapObj f a) (mapObj g a) (component natTrans a)
