@@ -40,10 +40,10 @@ compNatTrans : {cat1, cat2 : Cat} -> {f1, f2, f3 : FFunctor cat1 cat2}
   -> NatTrans cat1 cat2 f2 f3
   -> NatTrans cat1 cat2 f1 f2
   -> NatTrans cat1 cat2 f1 f3
-compNatTrans (MkNatTrans g pg) (MkNatTrans f pf) = MkNatTrans
-  (\a => o cat2 (g a) (f a))
-  (\ff => let ww = pg ff
-              yy = pf ff
+compNatTrans g f = MkNatTrans
+  (\a => o cat2 ((component g) a) ((component f) a))
+  (\ff => let ww = (naturality g) ff
+              yy = (naturality f) ff
           in ?pgpf)
 
 
