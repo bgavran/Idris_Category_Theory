@@ -18,25 +18,13 @@ import Utils
 |||  (t)          (b)     put: s x b -> t
 record Lens
   (lensCom : Comonoid)
-  (i' : (obj (cat (mc lensCom)), obj (cat (mc lensCom))))
-  (o' : (obj (cat (mc lensCom)), obj (cat (mc lensCom))))
+  (i' : (obj (cat (mc lensCom)), obj (cat (mc lensCom)))) -- (s, t)
+  (o' : (obj (cat (mc lensCom)), obj (cat (mc lensCom)))) -- (a, b)
     where
     constructor MkLens
     get : hom (cat (mc lensCom)) (fst i') (fst o')
     put : hom (cat (mc lensCom)) (mapObj (x (mc lensCom)) ((fst i'), (snd o'))) (snd i')
 
-
---(mapObj
---    (functorComposition (x cc) (productFunctor (x cc) idFunctor))
---    ((a, b), c))
---(mapObj
---    (functorComposition
---        (functorComposition (x cc) (productFunctor idFunctor (x cc)))
---        productAssociator)
---    ((a, b), c))
-
---(mapObj (x cc) (mapObj (x cc) (a, b), c))     -- ((a || b) || c)
---(mapObj (x cc) (a, mapObj (x cc) (b, c)))     -- (a || (b || c))
 
 composePut : (cmnd : Comonoid)
   -> (aa', bb', cc' : (obj (cat (mc cmnd)), obj (cat (mc cmnd))))
