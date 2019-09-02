@@ -24,46 +24,10 @@ record MonoidalCat where
 public export
 associatorMap : (cc : MonoidalCat) -> (a, b, c : obj (cat cc))
    -> hom (cat cc) (mapObj (x cc) (mapObj (x cc) (a, b), c)) (mapObj (x cc) (a, mapObj (x cc) (b, c)))
-associatorMap cc a b c = let zz = component (natTrans $ associator cc) ((a, b), c)
-                             --yy = rewriteProductFunctor (a, b) c (x cc) (idFunctor {cat=(cat cc)})
-                             --xx = rewrite yy in zz
-                         in ?zzz
-
-
---zz : hom (cat cc) (mapObj (x cc) (mapObj (productFunctor (x cc) (MkFFunctor AAA)) ((a, b), c)))
---                  (mapObj (x cc) (mapObj (productFunctor (MkFFunctor AAA) (x cc)) (a, (b, c))))
------------           into          ----------------------------
---zz : hom (cat cc) (mapObj (x cc) (mapObj (x cc) (a, b), c))
---                  (mapObj (x cc) (a, mapObj (x cc) (b, c)))
---
---
-
---typeMonoidal : MonoidalCat
---typeMonoidal = MkMonoidalCat
---  typeCat
---  ?cartesianProdType
---  ()
---  ?typeMonoidald
---  ?typeMonoidale
---  ?typeMonoidalf
+associatorMap cc a b c = component (natTrans $ associator cc) ((a, b), c)
 
 -- Monoidal product on objects
 public export
 (||) : {mcat : MonoidalCat}
   -> (a, b : obj (cat mcat)) -> obj (cat mcat)
 (||) {mcat} a b = mapObj (x mcat) (a, b)
-
-
---public export
---record LaxMonoidalFunctor (cat1 : MonoidalCat) (cat2 : MonoidalCat) where
---  constructor MkMonoidalFunctor
---  ffunctor : FFunctor (cat cat1) (cat cat2)
---  laxUnit : hom (cat cat2) (unit cat2) (mapObj ffunctor (unit cat1))
-  --laxTensor : NatTrans (productCategory cat1 cat1) cat2
-
-swapFunctor : FFunctor (productCategory cat1 cat2) (productCategory cat2 cat1)
-swapFunctor = MkFFunctor
-  (\o => (snd o, fst o))
-  (\(MkProdMor f g) => MkProdMor g f)
-  ?vbvbv
-  ?nmnm
